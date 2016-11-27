@@ -31,5 +31,6 @@ int main(int argc, char* argv[]) {
 	}
 
 	s.run(docroot, port);
+	s.join_all();
 	return 0;
 }

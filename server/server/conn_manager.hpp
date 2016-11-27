@@ -6,9 +6,16 @@
 
 class conn_manager {
 public:
-	typedef std::set<websocketpp::connection_hdl, std::owner_less<websocketpp::connection_hdl>> con_list;
+	typedef websocketpp::connection_hdl connection_hdl;
+	typedef std::map<connection_hdl, connection, std::owner_less<connection_hdl>> con_list;
 
-	con_list m_connections;
+	conn_manager();
+
+	connection & add_connection(connection_hdl);
+	void remove_connection(connection_hdl);
 
 private:
+	con_list m_connections;
+
+	int m_next_conn_id;
 };

@@ -21,6 +21,12 @@
     <ClCompile Include="ws_server.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="connection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="conn_manager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="connection.hpp">

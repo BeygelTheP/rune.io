@@ -10,7 +10,7 @@ ws_server::ws_server()
 	m_endpoint.set_access_channels(websocketpp::log::alevel::app); //app);
 
 	// Initialize the Asio transport policy
-	m_endpoint.init_asio();
+	m_endpoint.init_asio(&m_io_service);
 
 	// Bind the handlers we are using
 	using websocketpp::lib::placeholders::_1;
@@ -33,16 +33,24 @@ void ws_server::run(std::string docroot, uint16_t port) {
 	// Start the server accept loop
 	m_endpoint.start_accept();
 
-	// Set the initial timer to start telemetry
-	//set_timer();
+	// Start the ASIO io_service run loop on threads
+	for (unsigned int i = 0; i < m_num_threads; ++i) {
+		m_threads.create_thread(
+			[&]()
+		{
+			try {
+				m_endpoint.run();
+			}
+			catch (websocketpp::exception const & e) {
+				std::cout << e.what() << std::endl;
+			}
+		});
+	}
+}
 
-	// Start the ASIO io_service run loop
-	try {
-		m_endpoint.run();
-	}
-	catch (websocketpp::exception const & e) {
-		std::cout << e.what() << std::endl;
-	}
+void ws_server::join_all()
+{
+	m_threads.join_all();
 }
 
 void ws_server::on_http(connection_hdl hdl) {
@@ -94,9 +102,9 @@ void ws_server::on_http(connection_hdl hdl) {
 }
 
 void ws_server::on_open(connection_hdl hdl) {
-	m_conn_manager.m_connections.insert(hdl);
+	m_conn_manager.add_connection(hdl);
 }
 
 void ws_server::on_close(connection_hdl hdl) {
-	m_conn_manager.m_connections.erase(hdl);
+	m_conn_manager.remove_connection(hdl);
 }
