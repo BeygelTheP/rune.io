@@ -35,19 +35,17 @@ Global
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{9AE5E5D3-AB7F-48BE-8BE8-2441C79B9BD7}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{9AE5E5D3-AB7F-48BE-8BE8-2441C79B9BD7}.Debug|x86.ActiveCfg = Debug|Win32
-		{9AE5E5D3-AB7F-48BE-8BE8-2441C79B9BD7}.Debug|x86.Build.0 = Debug|Win32
+		{9AE5E5D3-AB7F-48BE-8BE8-2441C79B9BD7}.Debug|x86.ActiveCfg = Release|Win32
+		{9AE5E5D3-AB7F-48BE-8BE8-2441C79B9BD7}.Debug|x86.Build.0 = Release|Win32
 		{9AE5E5D3-AB7F-48BE-8BE8-2441C79B9BD7}.Release|Any CPU.ActiveCfg = Release|Win32
 		{9AE5E5D3-AB7F-48BE-8BE8-2441C79B9BD7}.Release|x86.ActiveCfg = Release|Win32
 		{9AE5E5D3-AB7F-48BE-8BE8-2441C79B9BD7}.Release|x86.Build.0 = Release|Win32
 		{D50CE68D-2860-4797-81A1-5B2CAF3D5B14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D50CE68D-2860-4797-81A1-5B2CAF3D5B14}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D50CE68D-2860-4797-81A1-5B2CAF3D5B14}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{D50CE68D-2860-4797-81A1-5B2CAF3D5B14}.Debug|x86.Build.0 = Debug|Any CPU
 		{D50CE68D-2860-4797-81A1-5B2CAF3D5B14}.Release|Any CPU.ActiveCfg = Debug|Any CPU
 		{D50CE68D-2860-4797-81A1-5B2CAF3D5B14}.Release|Any CPU.Build.0 = Debug|Any CPU
 		{D50CE68D-2860-4797-81A1-5B2CAF3D5B14}.Release|x86.ActiveCfg = Debug|Any CPU
-		{D50CE68D-2860-4797-81A1-5B2CAF3D5B14}.Release|x86.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -3,10 +3,12 @@
 #include <streambuf>
 #include <string>
 
-#include "ws_server.hpp"
+#include "server/ws_server.hpp"
+#include "world/world.hpp"
 
 int main(int argc, char* argv[]) {
 	ws_server s;
+	world w;
 
 	std::string docroot;
 	uint16_t port = 9002;
@@ -31,6 +33,14 @@ int main(int argc, char* argv[]) {
 	}
 
 	s.run(docroot, port);
+
+	w.set_server_channel(s.get_channel());
+
+	w.run();
+
+	// Waiting for all threads done.
 	s.join_all();
+	w.join_all();
+
 	return 0;
 }

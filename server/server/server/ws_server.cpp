@@ -4,7 +4,7 @@
 
 ws_server::ws_server()
 {
-	// set up access channels to only log interesting things
+	// Set up access channels to only log interesting things
 	m_endpoint.clear_access_channels(websocketpp::log::alevel::all);
 	m_endpoint.set_access_channels(websocketpp::log::alevel::access_core); //access_core);
 	m_endpoint.set_access_channels(websocketpp::log::alevel::app); //app);
@@ -12,15 +12,20 @@ ws_server::ws_server()
 	// Initialize the Asio transport policy
 	m_endpoint.init_asio(&m_io_service);
 
-	// Bind the handlers we are using
 	using websocketpp::lib::placeholders::_1;
 	using websocketpp::lib::bind;
+
+	// Bind the handlers we are using with network
 	m_endpoint.set_open_handler(bind(&ws_server::on_open, this, _1));
 	m_endpoint.set_close_handler(bind(&ws_server::on_close, this, _1));
 	m_endpoint.set_http_handler(bind(&ws_server::on_http, this, _1));
+
+	// Bind the queue submit handler
+	m_channel.bind_submit_handler(bind(&ws_server::on_queue_submit, this));
 }
 
-void ws_server::run(std::string docroot, uint16_t port) {
+void ws_server::run(std::string docroot, uint16_t port)
+{
 	std::stringstream ss;
 	ss << "Running telemetry server on port " << port << " using docroot=" << docroot;
 	m_endpoint.get_alog().write(websocketpp::log::alevel::app, ss.str());
@@ -53,7 +58,8 @@ void ws_server::join_all()
 	m_threads.join_all();
 }
 
-void ws_server::on_http(connection_hdl hdl) {
+void ws_server::on_http(connection_hdl hdl)
+{
 	// Upgrade our connection handle to a full connection_ptr
 	server::connection_ptr con = m_endpoint.get_con_from_hdl(hdl);
 
@@ -91,7 +97,7 @@ void ws_server::on_http(connection_hdl hdl) {
 	}
 
 	file.seekg(0, std::ios::end);
-	response.reserve(file.tellg());
+	response.reserve((unsigned int)file.tellg());
 	file.seekg(0, std::ios::beg);
 
 	response.assign((std::istreambuf_iterator<char>(file)),
@@ -101,10 +107,41 @@ void ws_server::on_http(connection_hdl hdl) {
 	con->set_status(websocketpp::http::status_code::ok);
 }
 
-void ws_server::on_open(connection_hdl hdl) {
+void ws_server::on_open(connection_hdl hdl)
+{
 	m_conn_manager.add_connection(hdl);
 }
 
-void ws_server::on_close(connection_hdl hdl) {
+void ws_server::on_close(connection_hdl hdl)
+{
 	m_conn_manager.remove_connection(hdl);
+}
+
+void ws_server::on_queue_submit()
+{
+	using websocketpp::lib::bind;
+
+	m_io_service.post(bind(&ws_server::on_queue_dispatch, this));
+}
+
+void ws_server::on_queue_dispatch()
+{
+	using websocketpp::lib::placeholders::_1;
+	using websocketpp::lib::bind;
+
+	m_channel.dispatch_queue(bind(&ws_server::on_channel_message, this, _1));
+}
+
+void ws_server::on_channel_message(message_ptr m_ptr)
+{
+	if (m_ptr->getType() != message::type::M_WS_SERVER)
+		m_endpoint.get_alog().write(websocketpp::log::alevel::app, "Not M_WS_SERVER message was dispatched on websocket server");
+	else {
+		m_endpoint.get_alog().write(websocketpp::log::alevel::app, "M_WS_SERVER message!");
+	}
+}
+
+channel * ws_server::get_channel(void)
+{
+	return &m_channel;
 }

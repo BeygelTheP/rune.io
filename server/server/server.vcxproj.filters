@@ -1,42 +1,55 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    <Filter Include="channel">
+      <UniqueIdentifier>{7599bbee-20c0-43f8-af4b-fe3429e65f1a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    <Filter Include="world">
+      <UniqueIdentifier>{58eb5d3e-7fd8-4044-83f4-4ae5074ca916}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="server">
+      <UniqueIdentifier>{aea8793d-a01c-4110-b122-cb12c886c624}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="world\world.cpp">
+      <Filter>world</Filter>
     </ClCompile>
-    <ClCompile Include="ws_server.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="server\conn_manager.cpp">
+      <Filter>server</Filter>
     </ClCompile>
-    <ClCompile Include="connection.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="server\connection.cpp">
+      <Filter>server</Filter>
     </ClCompile>
-    <ClCompile Include="conn_manager.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="server\ws_server.cpp">
+      <Filter>server</Filter>
+    </ClCompile>
+    <ClCompile Include="channel\channel.cpp">
+      <Filter>channel</Filter>
+    </ClCompile>
+    <ClCompile Include="channel\message.cpp">
+      <Filter>channel</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="connection.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="world\world.hpp">
+      <Filter>world</Filter>
     </ClInclude>
-    <ClInclude Include="conn_manager.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="server\conn_manager.hpp">
+      <Filter>server</Filter>
     </ClInclude>
-    <ClInclude Include="ws_server.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="server\connection.hpp">
+      <Filter>server</Filter>
+    </ClInclude>
+    <ClInclude Include="server\ws_server.hpp">
+      <Filter>server</Filter>
+    </ClInclude>
+    <ClInclude Include="channel\message.hpp">
+      <Filter>channel</Filter>
+    </ClInclude>
+    <ClInclude Include="channel\channel.hpp">
+      <Filter>channel</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,4 +1,6 @@
 #pragma once
+#ifndef RUNEIO_CONNECTION_HPP
+#define RUNEIO_CONNECTION_HPP
 
 #include <websocketpp/connection.hpp>
 #include <string>
@@ -30,3 +32,6 @@ private:
 };
 
 typedef std::shared_ptr<connection> connection_ptr;
+typedef std::weak_ptr<connection> connection_wptr;
+
+#endif //RUNEIO_CONNECTION_HPP

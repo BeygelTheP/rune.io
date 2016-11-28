@@ -1,7 +1,8 @@
 #pragma once
+#ifndef RUNEIO_CONN_MANAGER_HPP
+#define RUNEIO_CONN_MANAGER_HPP
 
 #include <set>
-
 #include "connection.hpp"
 
 class conn_manager {
@@ -11,7 +12,7 @@ public:
 
 	conn_manager();
 
-	connection & add_connection(connection_hdl);
+	void add_connection(connection_hdl);
 	void remove_connection(connection_hdl);
 
 private:
@@ -19,3 +20,5 @@ private:
 
 	int m_next_conn_id;
 };
+
+#endif //RUNEIO_CONN_MANAGER_HPP

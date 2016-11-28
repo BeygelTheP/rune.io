@@ -5,13 +5,11 @@ conn_manager::conn_manager()
 {
 }
 
-connection & conn_manager::add_connection(connection_hdl hdl)
+void conn_manager::add_connection(connection_hdl hdl)
 {
 	connection conn(m_next_conn_id++);
 
 	m_connections[hdl] = conn;
-
-	return conn;
 }
 
 void conn_manager::remove_connection(connection_hdl hdl)
