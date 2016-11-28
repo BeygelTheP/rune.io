@@ -1,6 +1,7 @@
 #include <memory>
 #include <chrono>
 
+#include "channel/network_message.hpp"
 #include "world.hpp"
 
 world::world()
@@ -35,11 +36,6 @@ void world::join_all()
 	m_threads.join_all();
 }
 
-void world::set_server_channel(channel * ch)
-{
-	m_server_channel = ch;
-}
-
 void world::m_set_tick_timer()
 {
 	m_tick_timer_ptr = std::make_shared<boost::asio::high_resolution_timer>(
@@ -58,7 +54,7 @@ void world::m_set_tick_timer()
 
 void world::m_on_tick_timer(const boost::system::error_code & e)
 {
-	m_server_channel->submit(std::make_shared<message>(message::type::M_WS_SERVER));
+	m_server_channel->submit(std::make_shared<network_message>("Boom!"));
 
 	m_set_tick_timer();
 }
@@ -85,4 +81,9 @@ void world::on_channel_message(message_ptr m_ptr)
 channel * world::get_channel(void)
 {
 	return &m_channel;
+}
+
+void world::set_server_channel(channel * ch)
+{
+	m_server_channel = ch;
 }

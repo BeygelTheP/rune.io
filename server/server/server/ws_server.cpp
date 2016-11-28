@@ -1,5 +1,7 @@
 #include <fstream>
 
+#include "channel/network_message.hpp"
+#include "channel/connection_message.hpp"
 #include "ws_server.hpp"
 
 ws_server::ws_server()
@@ -13,12 +15,14 @@ ws_server::ws_server()
 	m_endpoint.init_asio(&m_io_service);
 
 	using websocketpp::lib::placeholders::_1;
+	using websocketpp::lib::placeholders::_2;
 	using websocketpp::lib::bind;
 
 	// Bind the handlers we are using with network
 	m_endpoint.set_open_handler(bind(&ws_server::on_open, this, _1));
 	m_endpoint.set_close_handler(bind(&ws_server::on_close, this, _1));
 	m_endpoint.set_http_handler(bind(&ws_server::on_http, this, _1));
+	m_endpoint.set_message_handler(bind(&ws_server::on_message, this, _1, _2));
 
 	// Bind the queue submit handler
 	m_channel.bind_submit_handler(bind(&ws_server::on_queue_submit, this));
@@ -117,6 +121,13 @@ void ws_server::on_close(connection_hdl hdl)
 	m_conn_manager.remove_connection(hdl);
 }
 
+void ws_server::on_message(connection_hdl hdl, server::message_ptr msg)
+{
+	m_world_channel->submit(
+		std::make_shared<connection_message>(m_conn_manager[hdl], msg->get_payload())
+	);
+}
+
 void ws_server::on_queue_submit()
 {
 	using websocketpp::lib::bind;
@@ -134,14 +145,38 @@ void ws_server::on_queue_dispatch()
 
 void ws_server::on_channel_message(message_ptr m_ptr)
 {
-	if (m_ptr->getType() != message::type::M_WS_SERVER)
-		m_endpoint.get_alog().write(websocketpp::log::alevel::app, "Not M_WS_SERVER message was dispatched on websocket server");
-	else {
-		m_endpoint.get_alog().write(websocketpp::log::alevel::app, "M_WS_SERVER message!");
+	typedef message::type t;
+
+	std::shared_ptr<network_message> message;
+
+	switch (m_ptr->get_type()) {
+	case t::M_WS_CONN:
+		break;
+
+	case t::M_WS_GROUPCAST:
+		break;
+
+	case t::M_WS_NETWORK:
+		message = std::dynamic_pointer_cast<network_message>(m_ptr);
+
+		for (auto it = m_conn_manager.begin(); it != m_conn_manager.end(); ++it) {
+			m_endpoint.send(it->second->conn_hdl(), *(message->get_data()), websocketpp::frame::opcode::text);
+		}
+		break;
+
+	default:
+		m_endpoint.get_alog().write(websocketpp::log::alevel::app, "Wrong type message was dispatched on websocket server");
+		break;
+
 	}
 }
 
 channel * ws_server::get_channel(void)
 {
 	return &m_channel;
+}
+
+void ws_server::set_world_channel(channel * ch)
+{
+	m_world_channel = ch;
 }

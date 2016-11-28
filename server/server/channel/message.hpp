@@ -7,14 +7,18 @@
 class message {
 public:
 	enum type {
-		M_WS_USER,
-		M_WS_SERVER
+		M_WS_CONN,
+		M_WS_NETWORK,
+		M_WS_GROUPCAST
 	};
 
-	message(type t);
-	virtual ~message();
+	message(type t) : m_type(t) {};
+	virtual ~message() {};
 
-	type getType() const { return m_type; };
+	type get_type() const { return m_type; };
+
+protected:
+	void set_type(type t) { m_type = t; };
 
 private:
 	type m_type;

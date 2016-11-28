@@ -18,11 +18,13 @@ public:
 	void run(std::string docroot, uint16_t port);
 	void join_all();
 
-	void on_http(connection_hdl hdl);
-	void on_open(connection_hdl hdl);
-	void on_close(connection_hdl hdl);
+	void on_http(connection_hdl);
+	void on_open(connection_hdl);
+	void on_close(connection_hdl);
+	void on_message(connection_hdl, server::message_ptr);
 
 	channel * get_channel(void);
+	void set_world_channel(channel *);
 
 private:
 	static const unsigned int m_num_threads = 1;
@@ -32,6 +34,7 @@ private:
 	server m_endpoint;
 	conn_manager m_conn_manager;
 	channel m_channel;
+	channel * m_world_channel;
 	
 	std::string m_docroot;
 

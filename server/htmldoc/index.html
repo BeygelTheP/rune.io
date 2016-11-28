@@ -1,85 +1,261 @@
 <!doctype html>
 <html>
 <head>
-<title>WebSocket++ Telemetry Client</title>
+    <title>WebSocket++ Telemetry Client</title>
 </head>
-<body>
+<body onload="init()">
+    <script type="text/javascript">
+        var ws;
+        var url;
 
-<script type="text/javascript">
-var ws;
-var url;
+        var canvas = {
+            o: null,
+            ctx: null,
+            width: 300,
+            height: 200,
 
-function connect() {
-	url = document.getElementById("server_url").value;
-	
-	if ("WebSocket" in window) {
-		ws = new WebSocket(url);
-	} else if ("MozWebSocket" in window) {
-		ws = new MozWebSocket(url);
-	} else {
-		document.getElementById("messages").innerHTML += "This Browser does not support WebSockets<br />";
-		return;
-	}
-	ws.onopen = function(e) {
-		document.getElementById("messages").innerHTML += "Client: A connection to "+ws.url+" has been opened.<br />";
-		
-		document.getElementById("server_url").disabled = true;
-		document.getElementById("toggle_connect").innerHTML = "Disconnect";
-	};
-	
-	ws.onerror = function(e) {
-		document.getElementById("messages").innerHTML += "Client: An error occured, see console log for more details.<br />";
-		console.log(e);
-	};
-	
-	ws.onclose = function(e) {
-		document.getElementById("messages").innerHTML += "Client: The connection to "+url+" was closed. ["+e.code+(e.reason != "" ? ","+e.reason : "")+"]<br />";
-	    cleanup_disconnect();
-	};
-	
-	ws.onmessage = function(e) {
-		document.getElementById("messages").innerHTML += "Server: "+e.data+"<br />";
-	};
-}
+            init: function () {
+                this.o = document.getElementById("canvas");
+                this.ctx = this.o.getContext("2d");
+                this.set_size(640, 480);
 
-function disconnect() {
-	ws.close();
-	cleanup_disconnect();
-}
+                return this;
+            },
 
-function cleanup_disconnect() {
-    document.getElementById("server_url").disabled = false;
-	document.getElementById("toggle_connect").innerHTML = "Connect";
-}
+            clear: function () {
+                this.ctx.clearRect(0, 0, this.width, this.height);
+            },
 
-function toggle_connect() {
-	if (document.getElementById("server_url").disabled === false) {
-		connect();
-	} else {
-		disconnect();
-	}
-}
-</script>
+            draw: function () {
+                this.clear();
 
-<style>
-body,html {
-	margin: 0px;
-	padding: 0px;
-}
-#controls {
-	float:right;
-	background-color: #999;
-}
+                player.move();
+                player.draw(this.ctx);
+            },
 
-</style>
+            start_draw: function () {
+                var o = this;
+                setInterval(function () { o.draw() }, 10);
+            },
 
-<div id="controls">
-	<div id="server">
-	<input type="text" name="server_url" id="server_url" value="ws://localhost:80" /><br />
-	<button id="toggle_connect" onclick="toggle_connect();">Connect</button>
-	</div>
-</div>
-<div id="messages"></div>
+            set_size: function (w, h) {
+                this.o.width = w;
+                this.o.height = h;
+                this.o.style.width = w;
+                this.o.style.height = h;
+                this.width = w;
+                this.height = h;
+            }
+        }
 
+        var player = {
+            velocity: 1,
+            x: 100,
+            y: 100,
+            r: 20,
+            angle: 0,
+
+            move: function () {
+                var dx = 0;
+                var dy = 0;
+
+                // считаем базовый вектор движения
+                if (controls.keys.left) dx -= 1;
+                if (controls.keys.right) dx += 1;
+                if (controls.keys.up) dy -= 1;
+                if (controls.keys.down) dy += 1;
+
+                // если ничего не изменилось, не мучаемся
+                if (dx === 0 && dy === 0)
+                    return;
+
+                // нормализуем его, чтобы up+left (к примеру), не был быстрее, чем просто движение вперёд
+                // и тут же домножаем на скорость
+                var vec_norm = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2))
+                dx = dx / vec_norm * this.velocity;
+                dy = dy / vec_norm * this.velocity;
+
+                // двигаем персонажа
+                this.x += dx;
+                this.y += dy;
+
+                // проверяем, не вышел ли он за пределы поля
+                if (this.x < 0) this.x = 0;
+                if (this.x > canvas.width) this.x = canvas.width;
+                if (this.y < 0) this.y = 0;
+                if (this.y > canvas.height) this.y = canvas.height;
+
+                // пересчитываем угол взгляда (мы же передвинулись)
+                this.count_angle();
+            },
+
+            count_angle: function () {
+                this.angle = controls.count_angle(this.x, this.y);
+            },
+
+            draw: function (ctx) {
+                circle(ctx, this.x, this.y, this.r, this.angle);
+            }
+        };
+
+        var controls = {
+            cur_x: 0,
+            cur_y: 0,
+            keys: {
+                up: false,
+                down: false,
+                left: false,
+                right: false
+            },
+
+            init: function () {
+                var o = this;
+                window.onkeyup = function (e) { o.onKeyUp(e) };
+                window.onkeydown = function (e) { o.onKeyDown(e) };
+                window.onmousemove = function (e) { o.onMouseMove(e) };
+
+                return this;
+            },
+
+            onMouseMove: function (e) {
+                this.cur_x = e.pageX;
+                this.cur_y = e.pageY;
+
+                player.count_angle();
+            },
+
+            onKeyUp: function (e) {
+                e.preventDefault();
+
+                switch (e.keyCode) {
+                    case 65: this.keys.left = false; break;
+                    case 87: this.keys.up = false; break;
+                    case 68: this.keys.right = false; break;
+                    case 83: this.keys.down = false; break;
+                }
+            },
+
+            onKeyDown: function (e) {
+                e.preventDefault();
+
+                switch (e.keyCode) {
+                    case 65: this.keys.left = true; break;
+                    case 87: this.keys.up = true; break;
+                    case 68: this.keys.right = true; break;
+                    case 83: this.keys.down = true; break;
+                }
+            },
+
+            count_angle: function (x, y) {
+                var a_dx = this.cur_x - x;
+                var a_dy = this.cur_y - y;
+                var angle;
+
+                if (a_dx === 0 && a_dy === 0)
+                    angle = 0;
+                else
+                    angle = Math.acos(a_dx / Math.sqrt(Math.pow(a_dx, 2) + Math.pow(a_dy, 2)));
+
+                if (a_dy < 0)
+                    angle = -angle;
+
+                return angle;
+            }
+        }
+
+        function circle(ctx, x, y, r, a) {
+            var s = a - 0.05 * Math.PI;
+            var e = a + 0.05 * Math.PI;
+
+            ctx.beginPath();
+            ctx.arc(x, y, r, e, s);
+
+            ctx.moveTo(x + r * Math.cos(s), y + r * Math.sin(s));
+            ctx.lineTo(x + 1.5 * r * Math.cos(a), y + 1.5 * r * Math.sin(a));
+
+            ctx.moveTo(x + r * Math.cos(e), y + r * Math.sin(e));
+            ctx.lineTo(x + 1.5 * r * Math.cos(a), y + 1.5 * r * Math.sin(a));
+            ctx.stroke();
+        }
+
+        function connect() {
+            url = document.getElementById("server_url").value;
+
+            if ("WebSocket" in window) {
+                ws = new WebSocket(url);
+            } else if ("MozWebSocket" in window) {
+                ws = new MozWebSocket(url);
+            } else {
+                document.getElementById("messages").innerHTML += "This Browser does not support WebSockets<br />";
+                return;
+            }
+            ws.onopen = function (e) {
+                document.getElementById("messages").innerHTML += "Client: A connection to " + ws.url + " has been opened.<br />";
+
+                document.getElementById("server_url").disabled = true;
+                document.getElementById("toggle_connect").innerHTML = "Disconnect";
+            };
+
+            ws.onerror = function (e) {
+                document.getElementById("messages").innerHTML += "Client: An error occured, see console log for more details.<br />";
+                console.log(e);
+            };
+
+            ws.onclose = function (e) {
+                document.getElementById("messages").innerHTML += "Client: The connection to " + url + " was closed. [" + e.code + (e.reason != "" ? "," + e.reason : "") + "]<br />";
+                cleanup_disconnect();
+            };
+
+            ws.onmessage = function (e) {
+                document.getElementById("messages").innerHTML += "Server: " + e.data + "<br />";
+            };
+        }
+
+        function disconnect() {
+            ws.close();
+            cleanup_disconnect();
+        }
+
+        function cleanup_disconnect() {
+            document.getElementById("server_url").disabled = false;
+            document.getElementById("toggle_connect").innerHTML = "Connect";
+        }
+
+        function toggle_connect() {
+            if (document.getElementById("server_url").disabled === false) {
+                connect();
+            } else {
+                disconnect();
+            }
+        }
+
+        function init() {
+            controls.init();
+            canvas.init();
+
+            canvas.start_draw();
+        }
+    </script>
+    <style>
+        body, html {
+            margin: 0px;
+            padding: 0px;
+        }
+
+        #controls {
+            float: right;
+            background-color: #999;
+        }
+    </style>
+    <div id="controls">
+        <div id="server">
+            <input type="text" name="server_url" id="server_url" value="ws://localhost:80" /><br />
+            <button id="toggle_connect" onclick="toggle_connect();">Connect</button>
+        </div>
+    </div>
+    <canvas id="canvas">
+        This text is displayed if your browser does not support HTML5 Canvas.
+    </canvas>
+    <div id="messages"></div>
 </body>
 </html>

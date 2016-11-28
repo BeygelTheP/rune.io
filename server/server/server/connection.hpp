@@ -9,17 +9,21 @@
 // Connection class for pointing on all related services
 class connection {
 public:
-	connection(int id = -1);
+	connection(websocketpp::connection_hdl, int id = -1);
 
-	int get_conn_id() const;
+	int conn_id() const;
+	websocketpp::connection_hdl conn_hdl();
 
-	void set_session_id(std::string id);
-	std::string get_session_id() const;
+	void session_id(std::string id);
+	std::string session_id() const;
 
-	void set_nickname(std::string nickname);
-	std::string get_nickname() const;
+	void nickname(std::string nickname);
+	std::string nickname() const;
 
 private:
+	// Connection network handler
+	websocketpp::connection_hdl m_conn_hdl;
+
 	// Internal for current server run connection id (logic: dumb +1 for each new connection)
 	int m_conn_id;
 

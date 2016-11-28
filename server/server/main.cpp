@@ -32,10 +32,10 @@ int main(int argc, char* argv[]) {
 		port = uint16_t(i);
 	}
 
-	s.run(docroot, port);
-
+	s.set_world_channel(w.get_channel());
 	w.set_server_channel(s.get_channel());
 
+	s.run(docroot, port);
 	w.run();
 
 	// Waiting for all threads done.

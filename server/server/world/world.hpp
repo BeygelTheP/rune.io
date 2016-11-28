@@ -15,10 +15,9 @@ public:
 
 	void run();
 	void join_all();
-
-	void set_server_channel(channel *);
-
+	
 	channel * get_channel(void);
+	void set_server_channel(channel *);
 
 private:
 	static const unsigned int m_num_threads = 1;
@@ -26,10 +25,9 @@ private:
 	boost::asio::io_service m_io_service;
 	boost::thread_group m_threads;
 	channel m_channel;
+	channel * m_server_channel;
 
 	std::shared_ptr<boost::asio::high_resolution_timer> m_tick_timer_ptr;
-
-	channel * m_server_channel;
 
 	void m_set_tick_timer();
 	void m_on_tick_timer(const boost::system::error_code&);

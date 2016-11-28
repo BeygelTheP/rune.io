@@ -53,6 +53,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_WIN32_WINNT=0x0601;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DisableSpecificWarnings>4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -63,6 +64,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_WIN32_WINNT=0x0601;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DisableSpecificWarnings>4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -71,17 +73,22 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="channel\channel.cpp" />
-    <ClCompile Include="channel\message.cpp" />
+    <ClCompile Include="channel\connection_message.cpp" />
+    <ClCompile Include="channel\network_message.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="server\connection.cpp" />
+    <ClCompile Include="server\conn_group.cpp" />
     <ClCompile Include="server\conn_manager.cpp" />
     <ClCompile Include="server\ws_server.cpp" />
     <ClCompile Include="world\world.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="channel\channel.hpp" />
+    <ClInclude Include="channel\connection_message.hpp" />
     <ClInclude Include="channel\message.hpp" />
+    <ClInclude Include="channel\network_message.hpp" />
     <ClInclude Include="server\connection.hpp" />
+    <ClInclude Include="server\conn_group.hpp" />
     <ClInclude Include="server\conn_manager.hpp" />
     <ClInclude Include="server\ws_server.hpp" />
     <ClInclude Include="world\world.hpp" />

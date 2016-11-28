@@ -28,7 +28,13 @@
     <ClCompile Include="channel\channel.cpp">
       <Filter>channel</Filter>
     </ClCompile>
-    <ClCompile Include="channel\message.cpp">
+    <ClCompile Include="server\conn_group.cpp">
+      <Filter>server</Filter>
+    </ClCompile>
+    <ClCompile Include="channel\network_message.cpp">
+      <Filter>channel</Filter>
+    </ClCompile>
+    <ClCompile Include="channel\connection_message.cpp">
       <Filter>channel</Filter>
     </ClCompile>
   </ItemGroup>
@@ -49,6 +55,15 @@
       <Filter>channel</Filter>
     </ClInclude>
     <ClInclude Include="channel\channel.hpp">
+      <Filter>channel</Filter>
+    </ClInclude>
+    <ClInclude Include="server\conn_group.hpp">
+      <Filter>server</Filter>
+    </ClInclude>
+    <ClInclude Include="channel\network_message.hpp">
+      <Filter>channel</Filter>
+    </ClInclude>
+    <ClInclude Include="channel\connection_message.hpp">
       <Filter>channel</Filter>
     </ClInclude>
   </ItemGroup>
