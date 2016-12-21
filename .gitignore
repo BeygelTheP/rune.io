@@ -240,3 +240,11 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
+
+# protobuf cpp generated files
+/server/server/proto
+/server/htmldoc/js/protobuf
+/server/htmldoc/js/deps.js
+/server/htmldoc/js/min.js
+/server/htmldoc/js/protocol.js
+/server/htmldoc/js/closure-library

@@ -5,25 +5,28 @@
 #include <map>
 #include "connection.hpp"
 
+namespace runeio {
+
 class conn_group
 {
 public:
-	typedef std::map<int, connection_ptr>::iterator iterator;
+	typedef std::map<uint32_t, connection_ptr>::iterator iterator;
 
 	void add(connection_ptr);
-	void remove(int);
+	void remove(uint32_t);
 
-	connection_ptr & operator[](int &&);
-	connection_ptr & operator[](const int &);
+	connection_ptr & operator[](uint32_t);
 
 	iterator begin();
 	iterator end();
 
 private:
-	std::map<int, connection_ptr> m_connections;
+	std::map<uint32_t, connection_ptr> m_connections;
 };
 
 typedef std::shared_ptr<conn_group> conn_group_ptr;
+typedef std::weak_ptr<conn_group> conn_group_wptr;
 
+} // namespace runeio
 
 #endif //RUNEIO_CONN_GROUP_HPP

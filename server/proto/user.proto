@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package runeio.proto.user;
+
+message user {
+	int32 id = 1;
+}

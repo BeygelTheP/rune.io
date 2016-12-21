@@ -1,15 +1,23 @@
+#include <boost/bind.hpp>
 #include <fstream>
 
 #include "channel/network_message.hpp"
 #include "channel/connection_message.hpp"
+#include "channel/conn_group_message.hpp"
+#include "channel/conn_state_message.hpp"
 #include "ws_server.hpp"
 
+namespace runeio {
+
 ws_server::ws_server()
+	: m_channel(&m_io_service, boost::bind(&ws_server::on_channel_message, this, _1))
 {
 	// Set up access channels to only log interesting things
 	m_endpoint.clear_access_channels(websocketpp::log::alevel::all);
 	m_endpoint.set_access_channels(websocketpp::log::alevel::access_core); //access_core);
 	m_endpoint.set_access_channels(websocketpp::log::alevel::app); //app);
+	m_endpoint.set_error_channels(websocketpp::log::elevel::all); //app);
+	
 
 	// Initialize the Asio transport policy
 	m_endpoint.init_asio(&m_io_service);
@@ -21,25 +29,17 @@ ws_server::ws_server()
 	// Bind the handlers we are using with network
 	m_endpoint.set_open_handler(bind(&ws_server::on_open, this, _1));
 	m_endpoint.set_close_handler(bind(&ws_server::on_close, this, _1));
-	m_endpoint.set_http_handler(bind(&ws_server::on_http, this, _1));
 	m_endpoint.set_message_handler(bind(&ws_server::on_message, this, _1, _2));
-
-	// Bind the queue submit handler
-	m_channel.bind_submit_handler(bind(&ws_server::on_queue_submit, this));
 }
 
-void ws_server::run(std::string docroot, uint16_t port)
+void ws_server::run(uint16_t port)
 {
 	std::stringstream ss;
-	ss << "Running telemetry server on port " << port << " using docroot=" << docroot;
+	ss << "Running server on port " << port;
 	m_endpoint.get_alog().write(websocketpp::log::alevel::app, ss.str());
 
-	m_docroot = docroot;
-
-	// listen on specified port
 	m_endpoint.listen(port);
 
-	// Start the server accept loop
 	m_endpoint.start_accept();
 
 	// Start the ASIO io_service run loop on threads
@@ -47,11 +47,13 @@ void ws_server::run(std::string docroot, uint16_t port)
 		m_threads.create_thread(
 			[&]()
 		{
-			try {
-				m_endpoint.run();
-			}
-			catch (websocketpp::exception const & e) {
-				std::cout << e.what() << std::endl;
+			while (true) {
+				try {
+					m_endpoint.run();
+				}
+				catch (websocketpp::exception const & e) {
+					std::cout << "ws_server thread uncaught exception: " << e.what() << std::endl;
+				}
 			}
 		});
 	}
@@ -62,110 +64,100 @@ void ws_server::join_all()
 	m_threads.join_all();
 }
 
-void ws_server::on_http(connection_hdl hdl)
-{
-	// Upgrade our connection handle to a full connection_ptr
-	server::connection_ptr con = m_endpoint.get_con_from_hdl(hdl);
-
-	std::ifstream file;
-	std::string filename = con->get_resource();
-	std::string response;
-
-	m_endpoint.get_alog().write(websocketpp::log::alevel::app,
-		"http request1: " + filename);
-
-	if (filename == "/") {
-		filename = m_docroot + "index.html";
-	}
-	else {
-		filename = m_docroot + filename.substr(1);
-	}
-
-	m_endpoint.get_alog().write(websocketpp::log::alevel::app,
-		"http request2: " + filename);
-
-	file.open(filename.c_str(), std::ios::in);
-	if (!file) {
-		// 404 error
-		std::stringstream ss;
-
-		ss << "<!doctype html><html><head>"
-			<< "<title>Error 404 (Resource not found)</title><body>"
-			<< "<h1>Error 404</h1>"
-			<< "<p>The requested URL " << filename << " was not found on this server.</p>"
-			<< "</body></head></html>";
-
-		con->set_body(ss.str());
-		con->set_status(websocketpp::http::status_code::not_found);
-		return;
-	}
-
-	file.seekg(0, std::ios::end);
-	response.reserve((unsigned int)file.tellg());
-	file.seekg(0, std::ios::beg);
-
-	response.assign((std::istreambuf_iterator<char>(file)),
-		std::istreambuf_iterator<char>());
-
-	con->set_body(response);
-	con->set_status(websocketpp::http::status_code::ok);
-}
-
 void ws_server::on_open(connection_hdl hdl)
 {
-	m_conn_manager.add_connection(hdl);
+	auto conn_ptr = m_conn_manager.insert(hdl);
+	m_listen_channel->submit(
+		std::make_shared<conn_state_message>(conn_ptr->conn_id(), conn_state_message::state::M_CS_OPEN)
+	);
 }
 
 void ws_server::on_close(connection_hdl hdl)
 {
-	m_conn_manager.remove_connection(hdl);
+	auto it = m_conn_manager.find(hdl);
+	if (it == m_conn_manager.end_hdl())
+		return;
+
+	m_listen_channel->submit(
+		std::make_shared<conn_state_message>((*it)->conn_id(), conn_state_message::state::M_CS_CLOSE)
+	);
+
+	m_conn_manager.erase(hdl);
 }
 
 void ws_server::on_message(connection_hdl hdl, server::message_ptr msg)
 {
-	m_world_channel->submit(
-		std::make_shared<connection_message>(m_conn_manager[hdl], msg->get_payload())
+	auto it = m_conn_manager.find(hdl);
+	if (it == m_conn_manager.end_hdl())
+		return;
+
+	m_listen_channel->submit(
+		std::make_shared<connection_message>((*it)->conn_id(), msg->get_payload())
 	);
 }
 
-void ws_server::on_queue_submit()
+void ws_server::send(const conn_manager::id_iterator &it, std::shared_ptr<std::string> payload)
 {
-	using websocketpp::lib::bind;
-
-	m_io_service.post(bind(&ws_server::on_queue_dispatch, this));
+	try {
+		m_endpoint.send((*it)->conn_hdl(), *payload, websocketpp::frame::opcode::binary);
+	}
+	catch (std::exception e) {
+		std::cout << "ws_server::send exception: " << e.what() << std::endl;
+	}
 }
 
-void ws_server::on_queue_dispatch()
+void ws_server::send(const conn_manager::hdl_iterator &it, std::shared_ptr<std::string> payload)
 {
-	using websocketpp::lib::placeholders::_1;
-	using websocketpp::lib::bind;
-
-	m_channel.dispatch_queue(bind(&ws_server::on_channel_message, this, _1));
+	try {
+		m_endpoint.send((*it)->conn_hdl(), *payload, websocketpp::frame::opcode::binary);
+	}
+	catch (std::exception e) {
+		std::cout << "ws_server::send exception: " << e.what() << std::endl;
+	}
 }
 
 void ws_server::on_channel_message(message_ptr m_ptr)
 {
 	typedef message::type t;
 
-	std::shared_ptr<network_message> message;
-
 	switch (m_ptr->get_type()) {
 	case t::M_WS_CONN:
-		break;
+	{
+		std::shared_ptr<connection_message> message = std::static_pointer_cast<connection_message>(m_ptr);
 
+		auto it = m_conn_manager.find(message->get_conn_id());
+		if (it == m_conn_manager.end_id())
+			break;
+
+		send(it, message->get_data());
+
+		break;
+	}
 	case t::M_WS_GROUPCAST:
+	{
+		std::shared_ptr<conn_group_message> message = std::static_pointer_cast<conn_group_message>(m_ptr);
+
+		/*auto group_ptr = message->get_conn_group().lock();
+		if (!group_ptr)
+			break;
+
+		for (auto it = group_ptr->begin(); it != group_ptr->end(); ++it) {
+			send(it, message->get_data());
+		}*/
+
 		break;
-
+	}
 	case t::M_WS_NETWORK:
-		message = std::dynamic_pointer_cast<network_message>(m_ptr);
+	{
+		std::shared_ptr<network_message> message = std::static_pointer_cast<network_message>(m_ptr);
 
-		for (auto it = m_conn_manager.begin(); it != m_conn_manager.end(); ++it) {
-			m_endpoint.send(it->second->conn_hdl(), *(message->get_data()), websocketpp::frame::opcode::text);
+		for (auto it = m_conn_manager.begin_id(); it != m_conn_manager.end_id(); ++it) {
+			send(it, message->get_data());
 		}
 		break;
-
+	}
 	default:
-		m_endpoint.get_alog().write(websocketpp::log::alevel::app, "Wrong type message was dispatched on websocket server");
+		m_endpoint.get_alog().write(websocketpp::log::alevel::app, "Wrong message type was dispatched on websocket server");
 		break;
 
 	}
@@ -176,7 +168,9 @@ channel * ws_server::get_channel(void)
 	return &m_channel;
 }
 
-void ws_server::set_world_channel(channel * ch)
+void ws_server::set_listen_channel(channel * ch)
 {
-	m_world_channel = ch;
+	m_listen_channel = ch;
 }
+
+} // namespace runeio

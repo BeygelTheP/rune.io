@@ -1,29 +1,21 @@
 #include <iostream>
-#include <set>
-#include <streambuf>
 #include <string>
 
 #include "server/ws_server.hpp"
 #include "world/world.hpp"
 
 int main(int argc, char* argv[]) {
-	ws_server s;
-	world w;
-
-	std::string docroot;
+	runeio::ws_server server;
+	runeio::world world;
 	uint16_t port = 9002;
 
-	if (argc == 1) {
-		std::cout << "Usage: " << argv[0] << " [documentroot] [port]" << std::endl;
+	if (argc == 1 || argc > 2) {
+		std::cout << "Usage: " << argv[0] << " [port]" << std::endl;
 		return 2;
 	}
 
-	if (argc >= 2) {
-		docroot = std::string(argv[1]);
-	}
-
-	if (argc >= 3) {
-		int i = atoi(argv[2]);
+	if (argc == 2) {
+		int i = atoi(argv[1]);
 		if (i <= 0 || i > 65535) {
 			std::cout << "invalid port" << std::endl;
 			return 4;
@@ -32,15 +24,15 @@ int main(int argc, char* argv[]) {
 		port = uint16_t(i);
 	}
 
-	s.set_world_channel(w.get_channel());
-	w.set_server_channel(s.get_channel());
+	server.set_listen_channel(world.get_channel());
+	world.set_server_channel(server.get_channel());
 
-	s.run(docroot, port);
-	w.run();
+	server.run(port);
+	world.run();
 
 	// Waiting for all threads done.
-	s.join_all();
-	w.join_all();
+	server.join_all();
+	world.join_all();
 
 	return 0;
 }

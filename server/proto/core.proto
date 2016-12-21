@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+import "character.proto";
+import "user.proto";
+
+package runeio.proto;
+
+message info {
+	int32 tickdelay = 1;
+}
+
+message message {
+	oneof shared {
+		info info = 1;
+		string error = 2;
+		user.user user = 3;
+		character.game_state game_state = 4;
+		character.user_input user_input = 5;
+	}
+}

@@ -1,30 +1,59 @@
 #include "conn_manager.hpp"
 
-conn_manager::conn_manager()
-	: m_next_conn_id(0)
-{
-}
+namespace runeio {
 
-void conn_manager::add_connection(connection_hdl hdl)
+uint32_t conn_manager::m_next_conn_id = 1;
+std::mutex conn_manager::m_mutex;
+
+const connection_ptr& conn_manager::insert(conn_hdl hdl)
 {
+	std::unique_lock<std::mutex> lock(m_mutex);
 	connection_ptr c_ptr = std::make_shared<connection>(hdl, m_next_conn_id++);
 
-	m_connections[hdl] = c_ptr;
-	add(c_ptr);
+	auto ret = m_connections.insert(c_ptr).first;
+
+	return *ret;
 }
 
-void conn_manager::remove_connection(connection_hdl hdl)
+void conn_manager::erase(conn_hdl h)
 {
-	remove(m_connections[hdl]->conn_id());
-	m_connections.erase(hdl);
+	std::unique_lock<std::mutex> lock(m_mutex);
+	m_connections.get<hdl>().erase(h);
 }
 
-connection_ptr & conn_manager::operator[](connection_hdl && hdl)
+conn_manager::id_iterator conn_manager::find(const uint32_t & i)
 {
-	return m_connections[hdl];
+	return m_connections.get<id>().find(i);
 }
 
-connection_ptr & conn_manager::operator[](const connection_hdl & hdl)
+conn_manager::id_iterator conn_manager::begin_id()
 {
-	return m_connections[hdl];
+	return m_connections.get<id>().begin();
 }
+
+conn_manager::id_iterator conn_manager::end_id()
+{
+	return m_connections.get<id>().end();
+}
+
+conn_manager::hdl_iterator conn_manager::find(const conn_hdl & h)
+{
+	return m_connections.get<hdl>().find(h);
+}
+
+conn_manager::hdl_iterator conn_manager::end_hdl()
+{
+	return m_connections.get<hdl>().end();
+}
+
+bool conn_manager::empty() const
+{
+	return m_connections.empty();
+}
+
+std::size_t conn_manager::size() const
+{
+	return m_connections.size();
+}
+
+} // namespace runeio

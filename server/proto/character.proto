@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package runeio.proto.character;
+
+enum user_input_codes_base {
+	ZERO = 0;
+	KEY_UP = 1;
+	KEY_DOWN = 2;
+	KEY_RIGHT = 4;
+	KEY_LEFT = 8;
+}
+
+message user_input {
+	uint32 input_id = 1;
+	oneof shared {
+		uint32 input = 2;
+		float target_view_angle = 3;
+	}
+}
+
+message fvec {
+	float x = 1;
+	float y = 2;
+}
+
+message position {
+	fvec point = 1;
+	fvec velocity = 2;
+	float view_angle = 3;
+}
+
+message public_char {
+	position position = 1;
+}
+
+message private_char {
+	uint32 last_parsed_input_id = 1;
+}
+
+message game_state {
+	map<int32, public_char> pub_chars = 1;
+	private_char private_char = 2;
+}

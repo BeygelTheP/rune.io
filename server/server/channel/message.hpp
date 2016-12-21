@@ -4,10 +4,13 @@
 
 #include <memory>
 
+namespace runeio {
+
 class message {
 public:
 	enum type {
 		M_WS_CONN,
+		M_WS_CONN_STATE,
 		M_WS_NETWORK,
 		M_WS_GROUPCAST
 	};
@@ -25,5 +28,7 @@ private:
 };
 
 typedef std::shared_ptr<message> message_ptr;
+
+} // namespace runeio
 
 #endif //RUNEIO_MESSAGE_HPP

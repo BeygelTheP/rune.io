@@ -6,16 +6,25 @@
 #include <string>
 #include "message.hpp"
 
+namespace runeio {
+
 class network_message : public message {
 public:
-	network_message(std::shared_ptr<std::string>);
-	network_message(const std::string &);
-	network_message(const char *);
+	network_message(std::shared_ptr<std::string> str)
+		: message(type::M_WS_NETWORK), m_data_ptr(str) {}
+
+	network_message(const std::string & str)
+		: network_message(std::make_shared<std::string>(str)) {}
+
+	network_message(const char * str)
+		: network_message(std::string(str)) {}
 
 	std::shared_ptr<std::string> get_data(void) { return m_data_ptr; };
 
 private:
 	std::shared_ptr<std::string> m_data_ptr;
 };
+
+} // namespace runeio
 
 #endif //RUNEIO_NETWORK_MESSAGE_HPP

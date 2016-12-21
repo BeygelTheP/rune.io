@@ -1,20 +1,34 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="channel">
-      <UniqueIdentifier>{7599bbee-20c0-43f8-af4b-fe3429e65f1a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="world">
-      <UniqueIdentifier>{58eb5d3e-7fd8-4044-83f4-4ae5074ca916}</UniqueIdentifier>
+    <Filter Include="proto">
+      <UniqueIdentifier>{7898d06c-4e24-4b16-b70c-6a18049e3e42}</UniqueIdentifier>
+      <Extensions>h;cc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
     </Filter>
     <Filter Include="server">
-      <UniqueIdentifier>{aea8793d-a01c-4110-b122-cb12c886c624}</UniqueIdentifier>
+      <UniqueIdentifier>{d3f1cdcd-af69-405b-9e8e-1af5f1c3a6ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="world">
+      <UniqueIdentifier>{43f4d61a-192e-4d0a-a7b5-e570e717af76}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="channel">
+      <UniqueIdentifier>{f1caacfa-c640-4c04-b1c8-559f28c30ca8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="world\world.cpp">
-      <Filter>world</Filter>
+    <ClCompile Include="proto\character.pb.cc">
+      <Filter>proto</Filter>
+    </ClCompile>
+    <ClCompile Include="proto\core.pb.cc">
+      <Filter>proto</Filter>
+    </ClCompile>
+    <ClCompile Include="proto\user.pb.cc">
+      <Filter>proto</Filter>
+    </ClCompile>
+    <ClCompile Include="server\conn_group.cpp">
+      <Filter>server</Filter>
     </ClCompile>
     <ClCompile Include="server\conn_manager.cpp">
       <Filter>server</Filter>
@@ -25,22 +39,28 @@
     <ClCompile Include="server\ws_server.cpp">
       <Filter>server</Filter>
     </ClCompile>
+    <ClCompile Include="world\character.cpp">
+      <Filter>world</Filter>
+    </ClCompile>
+    <ClCompile Include="world\world.cpp">
+      <Filter>world</Filter>
+    </ClCompile>
     <ClCompile Include="channel\channel.cpp">
-      <Filter>channel</Filter>
-    </ClCompile>
-    <ClCompile Include="server\conn_group.cpp">
-      <Filter>server</Filter>
-    </ClCompile>
-    <ClCompile Include="channel\network_message.cpp">
-      <Filter>channel</Filter>
-    </ClCompile>
-    <ClCompile Include="channel\connection_message.cpp">
       <Filter>channel</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="world\world.hpp">
-      <Filter>world</Filter>
+    <ClInclude Include="proto\character.pb.h">
+      <Filter>proto</Filter>
+    </ClInclude>
+    <ClInclude Include="proto\core.pb.h">
+      <Filter>proto</Filter>
+    </ClInclude>
+    <ClInclude Include="proto\user.pb.h">
+      <Filter>proto</Filter>
+    </ClInclude>
+    <ClInclude Include="server\conn_group.hpp">
+      <Filter>server</Filter>
     </ClInclude>
     <ClInclude Include="server\conn_manager.hpp">
       <Filter>server</Filter>
@@ -51,19 +71,28 @@
     <ClInclude Include="server\ws_server.hpp">
       <Filter>server</Filter>
     </ClInclude>
-    <ClInclude Include="channel\message.hpp">
-      <Filter>channel</Filter>
+    <ClInclude Include="world\character.hpp">
+      <Filter>world</Filter>
+    </ClInclude>
+    <ClInclude Include="world\world.hpp">
+      <Filter>world</Filter>
     </ClInclude>
     <ClInclude Include="channel\channel.hpp">
       <Filter>channel</Filter>
     </ClInclude>
-    <ClInclude Include="server\conn_group.hpp">
-      <Filter>server</Filter>
+    <ClInclude Include="channel\connection_message.hpp">
+      <Filter>channel</Filter>
+    </ClInclude>
+    <ClInclude Include="channel\message.hpp">
+      <Filter>channel</Filter>
     </ClInclude>
     <ClInclude Include="channel\network_message.hpp">
       <Filter>channel</Filter>
     </ClInclude>
-    <ClInclude Include="channel\connection_message.hpp">
+    <ClInclude Include="channel\conn_group_message.hpp">
+      <Filter>channel</Filter>
+    </ClInclude>
+    <ClInclude Include="channel\conn_state_message.hpp">
       <Filter>channel</Filter>
     </ClInclude>
   </ItemGroup>

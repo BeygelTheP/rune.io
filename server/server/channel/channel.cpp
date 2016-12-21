@@ -1,19 +1,24 @@
 #include "channel.hpp"
 
+namespace runeio {
+
+channel::channel(boost::asio::io_service * service, handler handler)
+{
+	m_io_service = service;
+	m_handler = handler;
+}
+
 void channel::submit(message_ptr m_ptr)
 {
-	std::unique_lock<std::mutex> lock(m_mutex);
-	push(m_ptr);
-	if (m_submit_handler)
-		m_submit_handler();
+	{
+		std::unique_lock<std::mutex> lock(m_mutex);
+		push(m_ptr);
+	}
+
+	m_io_service->post(boost::bind(&channel::dispatch_one, this));
 }
 
-void channel::bind_submit_handler(submit_handler handler)
-{
-	m_submit_handler = handler;
-}
-
-message_ptr channel::dispatch_one()
+message_ptr channel::pop_message()
 {
 	std::unique_lock<std::mutex> lock(m_mutex);
 
@@ -23,9 +28,16 @@ message_ptr channel::dispatch_one()
 	return m_ptr;
 }
 
-void channel::dispatch_queue(dispatch_handler handler)
+void channel::dispatch_one()
+{
+	m_handler(pop_message());
+}
+
+void channel::dispatch_queue()
 {
 	while (!empty()) {
-		handler(dispatch_one());
+		dispatch_one();
 	}
 }
+
+} // namespace runeio
