@@ -11,6 +11,6 @@ back/front-end interaction.
 - [Google Closure Library](https://developers.google.com/closure/library/)
 
 ### Test server
-I'm running test server with my current in-development build on [runeio.ozmitel.ru](http://runeio.ozmitel.ru/).
+I'm running test server with my current in-development build on [runeio.wenye.ru](http://runeio.wenye.ru/).
 It may be not available at night in Moscow, but it's usually working at daytime. Also it can be broken, because
 I can work on it right at the time.
