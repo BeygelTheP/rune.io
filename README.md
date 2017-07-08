@@ -1,4 +1,4 @@
-# Rune.io
+# Webgame
 It's my pet project. I saw some .io games and wished to make one on my own.
 
 ### Technology stack
