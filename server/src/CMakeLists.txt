@@ -22,4 +22,4 @@ find_package(Protobuf 3.3.0 REQUIRED)
 add_subdirectory(proto)
 
 # setup modules
-#add_subdirectory(shard)
+add_subdirectory(shard)

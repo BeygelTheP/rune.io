@@ -2,12 +2,20 @@
 #include <memory>
 #include <chrono>
 
-#include "proto/core.pb.h"
-#include "proto/user.pb.h"
-#include "proto/character.pb.h"
+#include <proto/core.pb.h>
+#include <proto/user.pb.h>
+#include <proto/character.pb.h>
+
 #include "channel/connection_message.hpp"
 #include "channel/conn_state_message.hpp"
 #include "world.hpp"
+
+namespace {
+
+const unsigned int g_num_threads = 1;
+const int g_tickdelay = 50;
+
+} // namespace
 
 namespace runeio {
 
@@ -21,7 +29,7 @@ void world::run()
 	m_set_tick_timer();
 
 	// Start the ASIO io_service run loop on threads
-	for (unsigned int i = 0; i < m_num_threads; ++i) {
+    for (unsigned int i = 0; i < g_num_threads; ++i) {
 		m_threads.create_thread(
 			[&]()
 		{
@@ -44,7 +52,7 @@ void world::m_set_tick_timer()
 {
 	m_tick_timer_ptr = std::make_shared<boost::asio::high_resolution_timer>(
 		m_io_service,
-		std::chrono::milliseconds(m_tickdelay)
+        std::chrono::milliseconds(g_tickdelay)
 	);
 
 	m_tick_timer_ptr->async_wait(
@@ -120,7 +128,7 @@ void world::on_channel_message(message_ptr m_ptr)
 			auto net_message = proto::message::default_instance();
 			
 			auto net_info = net_message.mutable_info();
-			net_info->set_tickdelay(m_tickdelay);
+            net_info->set_tickdelay(g_tickdelay);
 			m_server_channel->submit(std::make_shared<connection_message>(message->get_conn_id(), net_message.SerializeAsString()));
 
 			auto net_user = net_message.mutable_user();

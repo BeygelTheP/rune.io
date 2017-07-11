@@ -22,9 +22,6 @@ public:
 	void set_server_channel(channel *);
 
 private:
-	static const unsigned int m_num_threads = 1;
-	static const int m_tickdelay = 50;
-
 	boost::asio::io_service m_io_service;
 	boost::thread_group m_threads;
 	channel m_channel;
