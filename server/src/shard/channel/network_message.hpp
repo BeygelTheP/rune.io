@@ -19,7 +19,7 @@ public:
 	network_message(const char * str)
 		: network_message(std::string(str)) {}
 
-	std::shared_ptr<std::string> get_data(void) { return m_data_ptr; };
+    std::shared_ptr<std::string> get_data(void) { return m_data_ptr; }
 
 private:
 	std::shared_ptr<std::string> m_data_ptr;

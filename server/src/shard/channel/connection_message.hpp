@@ -23,7 +23,7 @@ public:
 	connection_message(uint32_t conn_id, const char * str)
 		: connection_message(conn_id, std::string(str)) {}
 
-	uint32_t get_conn_id() { return m_conn_id; };
+    uint32_t get_conn_id() { return m_conn_id; }
 
 private:
 	uint32_t m_conn_id;

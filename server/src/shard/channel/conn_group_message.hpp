@@ -23,7 +23,7 @@ public:
 	conn_group_message(conn_group_wptr conn_group_ptr, const char * str)
 		: conn_group_message(conn_group_ptr, std::string(str)) {}
 
-	conn_group_wptr get_conn_group() { return m_conn_group_ptr; };
+    conn_group_wptr get_conn_group() { return m_conn_group_ptr; }
 
 private:
 	conn_group_wptr m_conn_group_ptr;

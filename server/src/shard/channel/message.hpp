@@ -15,13 +15,12 @@ public:
 		M_WS_GROUPCAST
 	};
 
-	message(type t) : m_type(t) {};
-	virtual ~message() {};
+    message(type t) : m_type(t) {}
 
-	type get_type() const { return m_type; };
+    type get_type() const { return m_type; }
 
 protected:
-	void set_type(type t) { m_type = t; };
+    void set_type(type t) { m_type = t; }
 
 private:
 	type m_type;
