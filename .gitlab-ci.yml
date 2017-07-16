@@ -2,20 +2,12 @@ image: webgame-build
 
 stages:
   - build
-  - test
 
 build-server:
   stage: build
   script: 
-     - pwd
+     - ls -al
 #    - cmake -GNinja server/src/ && ninja
 #  artifacts:
 #    paths:
 #      - server/bin
-
-
-# run tests using the binary built before
-test:
-  stage: test
-  script:
-    - pwd
