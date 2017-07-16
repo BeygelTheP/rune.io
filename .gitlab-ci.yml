@@ -6,7 +6,8 @@ stages:
 build-server:
   stage: build
   script: 
-    - cmake -GNinja server/src/ && ninja
+     - pwd
+#    - cmake -GNinja server/src/ && ninja
   artifacts:
     paths:
       - server/bin
