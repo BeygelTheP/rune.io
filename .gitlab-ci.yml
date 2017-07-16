@@ -2,6 +2,7 @@ image: webgame-build
 
 stages:
   - build
+  - test
 
 build-server:
   stage: build
