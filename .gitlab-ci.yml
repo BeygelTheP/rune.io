@@ -10,4 +10,4 @@ build-server:
   artifacts:
     paths:
       - server/bin
-    expire_in: 2 week
+    expire_in: 1 week
