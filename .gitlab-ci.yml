@@ -1,0 +1,12 @@
+image: webgame-build
+
+stages:
+  - build
+
+build-server:
+  stage: build
+  script: 
+    - cmake -GNinja server/src/ && ninja
+  artifacts:
+    paths:
+      - server/bin
