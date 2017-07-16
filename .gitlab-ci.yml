@@ -8,6 +8,13 @@ build-server:
   script: 
      - pwd
 #    - cmake -GNinja server/src/ && ninja
-  artifacts:
-    paths:
-      - server/bin
+#  artifacts:
+#    paths:
+#      - server/bin
+
+
+# run tests using the binary built before
+test:
+  stage: test
+  script:
+    - pwd
