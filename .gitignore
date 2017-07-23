@@ -1,5 +1,5 @@
-tmp/
-bin/
+server/tmp/
+server/bin/
 CMakeLists.txt.user
-node_modules/
+client/node_modules/
 client/dist/
