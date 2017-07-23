@@ -7,7 +7,6 @@ project(Server
 set(EXECUTABLE_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/../bin/${CMAKE_BUILD_TYPE}/")
 
 # setup boost
-set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost 1.62.0
     COMPONENTS thread system REQUIRED)
 
@@ -15,7 +14,6 @@ find_package(Boost 1.62.0
 find_package(WebsocketPP REQUIRED)
 
 # setup protobuf
-set(Protobuf_USE_STATIC_LIBS ON)
 find_package(Protobuf 3.3.0 REQUIRED)
 
 # setup proto
