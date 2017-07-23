@@ -4,7 +4,7 @@
   "description": "Webgame Client",
   "main": "index.js",
   "scripts": {
-    "start": "webpack"
+    "start": "node serve.js"
   },
   "repository": {
     "type": "git",
@@ -35,11 +35,14 @@
     "eslint-plugin-import": "^2.7.0",
     "eslint-plugin-jsx-a11y": "^5.1.1",
     "eslint-plugin-react": "^7.1.0",
+    "express": "^4.15.3",
     "file-loader": "^0.11.2",
     "json-loader": "^0.5.4",
     "style-loader": "^0.18.2",
     "url-loader": "^0.5.9",
-    "webpack": "^3.3.0"
+    "webpack": "^3.3.0",
+    "webpack-dev-middleware": "^1.11.0",
+    "webpack-hot-middleware": "^2.18.2"
   },
   "dependencies": {
     "react": "^15.6.1",
